@@ -1,0 +1,47 @@
+[
+  {
+    "workout_id": "w001",
+    "app": "Fitness Tracker",
+    "timestamp": "2023-10-01 15:30:00",
+    "timezone": "PST",
+    "exercise_type": "Running",
+    "duration_minutes": 45,
+    "calories_burned": 520
+  },
+  {
+    "workout_id": "w002",
+    "app": "Fitness Tracker",
+    "timestamp": "2023-10-01 23:45:00",
+    "timezone": "PST",
+    "exercise_type": "Yoga",
+    "duration_minutes": 60,
+    "calories_burned": 180
+  },
+  {
+    "workout_id": "w003",
+    "app": "Fitness Tracker",
+    "timestamp": "2023-10-02 06:00:00",
+    "timezone": "PST",
+    "exercise_type": "Running",
+    "duration_minutes": 30,
+    "calories_burned": 350
+  },
+  {
+    "workout_id": "w004",
+    "app": "Fitness Tracker",
+    "timestamp": "2023-10-03 19:00:00",
+    "timezone": "PST",
+    "exercise_type": "Cycling",
+    "duration_minutes": 90,
+    "calories_burned": 750
+  },
+  {
+    "workout_id": "w005",
+    "app": "Fitness Tracker",
+    "timestamp": "2023-10-04 22:30:00",
+    "timezone": "PST",
+    "exercise_type": "Swimming",
+    "duration_minutes": 45,
+    "calories_burned": 400
+  }
+]

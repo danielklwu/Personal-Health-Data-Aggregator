@@ -23,13 +23,15 @@ Health data is notoriously fragmented. This project merges two datasets that don
 
 ### Tool Choices & Reasoning
 - **Timestamp Conversion:**
-  - Considered using manual math, `pytz`, and `zoneinfo`. Decided on `zoneinfo` (Python 3.9+) over `pytz` for timezone conversion because it's built-in, standards-compliant, and avoids external dependencies. This ensures correct handling of daylight saving and ambiguous times.
+  - Considered using manual math, `pytz`, and `zoneinfo`. Decided on `zoneinfo` (Python 3.9+) over `pytz` for timezone conversion because it's built-in, standards-compliant, and avoids external dependencies. This ensures the correct handling of daylight saving and ambiguous times.
 - **Data Parsing:**
   - Used Python's `json` and `datetime` modules for robust, readable parsing.
 - **Aggregation & Metrics:**
   - Designed modular functions for merging and metric calculation, making it easy to extend and test.
 - **Testing:**
-  - Wrote comprehensive unit tests for normalization, merging, and metrics. Edge cases (like day boundary crossing) are explicitly tested.
+  - Wrote comprehensive unit tests for normalization, merging, and metrics. Edge cases (such as day boundary crossings) are explicitly tested.
+- **AI Usage Disclosure:**
+  - AI was used to generate input JSON files and unit test example data. Unit test results were manually verified to ensure accuracy and reliability.
 
 ### Output Verification
 - **Unit Tests:**
@@ -53,8 +55,5 @@ Health data is notoriously fragmented. This project merges two datasets that don
 
 ## Pipeline Recap
 - Ingestion → Normalization → Alignment → Aggregation → Metric Calculation → Validation
-
-## AI Usage Disclosure
-- AI was used to generate input JSON files and unit test example data. Unit test results were verified by hand to ensure accuracy and reliability.
 
 ---

@@ -10,6 +10,7 @@ from datetime import datetime
 
 from src.normalizer import TimestampNormalizer
 from src.merger import DataMerger
+from src.metrics import HealthMetrics
 
 
 class TestTimestampNormalizer(unittest.TestCase):
@@ -223,6 +224,136 @@ class TestDataMerger(unittest.TestCase):
         self.assertEqual(report[0]["date"], "2023-10-01")
         self.assertEqual(report[1]["date"], "2023-10-02")
 
+
+class TestHealthMetrics(unittest.TestCase):
+    """Test health metrics calculations."""
+
+    def setUp(self):
+        """Set up test data."""
+        # Create a sample report structure
+        self.sample_report = {
+            "metadata": {
+                "sleep_records_processed": 4,
+                "workout_records_processed": 4,
+                "dates_covered": 4,
+            },
+            "detailed report": [
+                {
+                    "date": "2023-10-01",
+                    "sleep": {
+                        "count": 1,
+                        "total_duration_hours": 8,
+                        "average_quality_score": 85.0,
+                    },
+                    "workouts": {
+                        "count": 1,
+                        "total_duration_minutes": 45,
+                        "total_calories_burned": 500,
+                    },
+                },
+                {
+                    "date": "2023-10-02",
+                    "sleep": {
+                        "count": 1,
+                        "total_duration_hours": 6,  
+                        "average_quality_score": 70.0,
+                    },
+                    "workouts": {
+                        "count": 2,
+                        "total_duration_minutes": 90,
+                        "total_calories_burned": 800,
+                    },
+                },
+                {
+                    "date": "2023-10-03",
+                    "sleep": {
+                        "count": 1,
+                        "total_duration_hours": 5.5,  
+                        "average_quality_score": 65.0,
+                    },
+                    "workouts": {
+                        "count": 1,
+                        "total_duration_minutes": 60,
+                        "total_calories_burned": 600,
+                    },
+                },
+                {
+                    "date": "2023-10-04",
+                    "sleep": {
+                        "count": 0,  # No sleep data
+                        "total_duration_hours": 0,
+                        "average_quality_score": 0,
+                    },
+                    "workouts": {
+                        "count": 1,
+                        "total_duration_minutes": 30,
+                        "total_calories_burned": 300,
+                    },
+                },
+            ],
+        }
+
+    def test_find_avg_calories_by_sleep_below_threshold(self):
+        """Test average calories calculation for days below sleep threshold."""
+        # Default threshold of 7 hours should catch 10/2 (6h) and 10/3 (5.5h)
+        result = HealthMetrics.find_avg_calories_by_sleep(
+            self.sample_report, threshold=7
+        )
+        # Average calories = (800 + 600) / 2 = 700
+        self.assertEqual(result, 700)
+
+    def test_find_avg_calories_by_sleep_with_higher_threshold(self):
+        """Test with higher threshold to include more days."""
+        # Threshold of 9 hours should catch all days with sleep data
+        result = HealthMetrics.find_avg_calories_by_sleep(
+            self.sample_report, threshold=9
+        )
+        # Average calories = (500 + 800 + 600) / 3 = 633
+        self.assertEqual(result, 633)
+
+    def test_find_avg_calories_by_sleep_no_days_below_threshold(self):
+        """Test when no days are below threshold."""
+        # Threshold of 5 hours - no days below this
+        result = HealthMetrics.find_avg_calories_by_sleep(
+            self.sample_report, threshold=5
+        )
+        self.assertEqual(result, 0)
+
+    def test_find_avg_calories_by_sleep_with_zero_sleep_days(self):
+        """Test that days with zero sleep (no data) are ignored."""
+        # Days with no sleep data should not be included
+        result = HealthMetrics.find_avg_calories_by_sleep(
+            self.sample_report, threshold=7
+        )
+        # 10/4 with 0 hours should not be counted
+        self.assertEqual(result, 700)
+
+    def test_find_avg_calories_by_sleep_empty_report(self):
+        """Test with empty report."""
+        empty_report = {
+            "metadata": {"sleep_records_processed": 0},
+            "detailed report": [],
+        }
+        result = HealthMetrics.find_avg_calories_by_sleep(empty_report, threshold=7)
+        self.assertEqual(result, 0)
+
+    def test_find_avg_calories_by_sleep_edge_case_exact_threshold(self):
+        """Test behavior when sleep equals threshold exactly."""
+        report = {
+            "detailed report": [
+                {
+                    "date": "2023-10-01",
+                    "sleep": {
+                        "count": 1,
+                        "total_duration_hours": 7,  # Exactly at threshold
+                    },
+                    "workouts": {"total_calories_burned": 500},
+                }
+            ]
+        }
+        # At threshold (7 == 7) should NOT be included (only < threshold)
+        result = HealthMetrics.find_avg_calories_by_sleep(report, threshold=7)
+        self.assertEqual(result, 0)
 
 if __name__ == "__main__":
     unittest.main()

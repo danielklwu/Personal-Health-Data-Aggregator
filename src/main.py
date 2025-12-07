@@ -16,6 +16,7 @@ from typing import Dict, List, Any
 
 from normalizer import TimestampNormalizer
 from merger import DataMerger
+from metrics import HealthMetrics
 
 class HealthDataAggregator:
     def __init__(self, sleep_file: str, workout_file: str, output_file: str = None):
@@ -154,16 +155,19 @@ def main():
     # 1. Parse input arguments
     parser = argparse.ArgumentParser(
         description="Merge health datasets with proper timezone normalization",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   %(prog)s data/sleep.json data/workouts.json
   %(prog)s data/sleep.json data/workouts.json -o output.json
+  %(prog)s data/sleep.json data/workouts.json -o output.json -t 10
         """,
     )
 
     parser.add_argument("sleep_file", help="Path to sleep data file (JSON, timestamps in UTC)")
     parser.add_argument("workout_file", help="Path to workout data file (JSON, timestamps in Local Time)")
     parser.add_argument("-o", "--output", help="Output file for merged data (optional)")
+    parser.add_argument("-t", "--threshold", help="Threshold value for metric (default 7)")
 
     args = parser.parse_args()
 
@@ -175,10 +179,17 @@ Examples:
     )
 
     result = aggregator.run()
+    print("\nAggregation completed!\n")
 
     # 3. Calculate simple metric
+    print("=" * 50)
+    threshold = int(args.threshold) if args.threshold else 7
+    avg_cal = HealthMetrics.find_avg_calories_by_sleep(
+        reports=result,
+        threshold=threshold
+    )
 
-    print("\nAggregation completed!\n")
+    print(f"\nThe average calories burned on days where sleep was less than {threshold} hours is: {avg_cal}\n")
 
 if __name__ == "__main__":
     main()

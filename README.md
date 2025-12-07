@@ -44,7 +44,7 @@ Health data is notoriously fragmented. This project merges two datasets that don
    ```bash
    python src/main.py data/sleep.json data/workouts.json -o output.json
    ```
-   - Use `-o output.json` to view merged output.
+   - Use `-o <output file name>` to view merged output.
    - Use `-t <hours>` to set the sleep threshold for metrics.
 3. **Run Tests:**
    ```bash

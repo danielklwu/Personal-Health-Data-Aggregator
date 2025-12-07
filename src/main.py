@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Dict, List, Any
 
 from normalizer import TimestampNormalizer
+from merger import DataMerger
 
 class HealthDataAggregator:
     def __init__(self, sleep_file: str, workout_file: str, output_file: str = None):
@@ -110,19 +111,40 @@ class HealthDataAggregator:
             print(f"Error normalizing data: {e}")
             sys.exit(1)
 
-        print("\nDEBUG sleep data:", normalized_sleep)
-        print("\nDEBUG workout data:", normalized_workouts)
+        # print("\nDEBUG sleep data:", normalized_sleep)
+        # print("\nDEBUG workout data:", normalized_workouts)
 
         # 3. Merge by date
+        print("\nMerging by date...")
+        merged_data = DataMerger.merge_by_date(normalized_sleep, normalized_workouts)
+        print("Dates merged")
 
         # 4. Generate report
+        print("\nGenerating report...")
+        report = DataMerger.generate_merged_report(merged_data)
+        print(f"Report generated")
 
         # 5. Output results
-        # if self.output_file:
-        #     print(f"\nWriting result to {self.output_file}...")
-        #     with open(self.output_file, "w") as f:
-        #         pass
-        #     print(f"Result written")
+        result = {
+            "metadata": {
+                "sleep_records_processed": len(normalized_sleep),
+                "workout_records_processed": len(normalized_workouts),
+                "dates_covered": len(merged_data),
+                "date_range": {
+                    "start": min(merged_data.keys()) if merged_data else None,
+                    "end": max(merged_data.keys()) if merged_data else None,
+                },
+            },
+            "detailed report": report,
+        }
+
+        if self.output_file:
+            print(f"\nWriting result to {self.output_file}...")
+            with open(self.output_file, "w") as f:
+                json.dump(result, f, indent=2)
+            print(f"Result written")
+
+        return result
 
 def main():
     """
@@ -153,6 +175,8 @@ Examples:
     )
 
     result = aggregator.run()
+
+    # 3. Calculate simple metric
 
     print("\nAggregation completed!\n")
 
